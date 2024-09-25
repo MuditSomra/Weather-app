@@ -15,13 +15,16 @@ def speak(text):
 city = speak("Say the city name you want to search weather.")
 r = sr.Recognizer()
  # recognize speech using Sphinx
+correct = "false"
 try:
-    with sr.Microphone() as source:
-        print("Say the city name you want to search weather...")
-        audio = r.listen(source)
+    while correct.lower()=="false":
+        with sr.Microphone() as source:
+            print("Say the city name you want to search weather...")
+            audio = r.listen(source,timeout=4)
+        city = r.recognize_google(audio)
+        correct = input(f"Did i got it right {city} type true or false")
+        city = city.lower()
 
-    city = r.recognize_google(audio)
-    city = city.lower()
 except Exception as e:
     print(e)
          
