@@ -11,22 +11,37 @@ def speak(text):
     engine.say(text)
     engine.runAndWait()
 
-
-city = speak("Say the city name you want to search weather.")
-r = sr.Recognizer()
- # recognize speech using Sphinx
-correct = "false"
-try:
-    while correct.lower()=="false":
+def get_city_name():
+    city = ""
+    
+    r    = sr.Recognizer()
+    try:
         with sr.Microphone() as source:
-            print("Say the city name you want to search weather...")
-            audio = r.listen(source,timeout=4)
+                print("Say the city name you want to search weather...")
+                audio = r.listen(source,timeout=4)
         city = r.recognize_google(audio)
-        correct = input(f"Did i got it right {city} type true or false")
+    except sr.WaitTimeoutError:
+        print("Speech recognition timed out, please try again.")
+    except sr.UnknownValueError:
+        print("Sorry, I couldn't understand. Please repeat.")
+    except Exception as e:
+        print(f"Error: {e}")
+    return city.lower()
+ # recognize speech using Sphinx
+correct = False
+while not correct:
+    speak("Say the city name you want to search weather.")
+    city = get_city_name()
+    if city:
         city = city.lower()
+        correct_input = input(f"Did I get it right: {city}? Type 'true' or 'false': ").strip().lower()
+        if correct_input == "true":
+            correct = True
+    else:
+        print("No city detected, please try again.")
+    
 
-except Exception as e:
-    print(e)
+
          
 response = requests.get(f"https://api.weatherapi.com/v1/current.json?key={apiKey}&q={city}")
 
